@@ -15,18 +15,22 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ players }) => {
         <h2 className="font-press-start text-xl text-pokemon-dark">Top Players</h2>
       </div>
       <div className="bg-pokemon-light border-2 border-pokemon-border rounded p-4">
-        {players.map((player, index) => (
-          <div
-            key={player.uuid}
-            className="flex items-center p-3 mb-2 hover:bg-pokemon-green/10 transition-colors rounded"
-          >
-            <span className="font-press-start text-sm text-pokemon-dark w-8">{index + 1}.</span>
-            <span className="font-mono text-pokemon-dark flex-1">{player.name}</span>
-            <span className="font-mono text-pokemon-gray">
-              Total Level: {Object.values(player.heroes).reduce((acc, hero) => acc + hero.level, 0)}
-            </span>
-          </div>
-        ))}
+        {players.length === 0 ? (
+          <p className="text-center text-pokemon-dark font-mono py-4">Loading players...</p>
+        ) : (
+          players.map((player, index) => (
+            <div
+              key={player.uuid}
+              className="flex items-center p-3 mb-2 hover:bg-pokemon-green/10 transition-colors rounded"
+            >
+              <span className="font-press-start text-sm text-pokemon-dark w-8">{index + 1}.</span>
+              <span className="font-mono text-pokemon-dark flex-1">{player.name}</span>
+              <span className="font-mono text-pokemon-gray">
+                {Object.values(player.heroes || {}).reduce((acc, hero) => acc + hero.level, 0)} Points
+              </span>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

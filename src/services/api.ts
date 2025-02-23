@@ -25,7 +25,12 @@ interface PlayerDBResponse {
 
 async function getPlayerNameFromUUID(uuid: string): Promise<string> {
   try {
-    const response = await axios.get<PlayerDBResponse>(`${PLAYERDB_API_URL}/${uuid}`);
+    // Format UUID with dashes if it doesn't have them
+    const formattedUUID = uuid.replace(
+      /(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/,
+      '$1-$2-$3-$4-$5'
+    );
+    const response = await axios.get<PlayerDBResponse>(`${PLAYERDB_API_URL}/${formattedUUID}`);
     return response.data.data.player.username;
   } catch (error) {
     console.error('Failed to fetch player name:', error);
@@ -43,6 +48,7 @@ export const api = {
       players.map(async (player: any) => ({
         ...player,
         name: await getPlayerNameFromUUID(player.uuid),
+        heroes: player.heroes || {} // Ensure heroes exists
       }))
     );
     
@@ -51,7 +57,7 @@ export const api = {
 
   async searchPlayer(name: string): Promise<Player | null> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/stats/heroes/player/${name}`);
+      const response = await axios.get(`${API_BASE_URL}/stats/stats/heroes/player/${name}`);
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
