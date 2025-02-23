@@ -36,9 +36,10 @@ interface PlayerDBResponse {
   };
 }
 
+export type SortField = 'kills' | 'deaths' | 'xp' | 'currentKillStreak' | 'highestKillStreak' | 'bounty';
+
 async function getPlayerNameFromUUID(uuid: string): Promise<string> {
   try {
-    // Format UUID with dashes if it doesn't have them
     const formattedUUID = uuid.replace(
       /(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/,
       '$1-$2-$3-$4-$5'
@@ -47,25 +48,20 @@ async function getPlayerNameFromUUID(uuid: string): Promise<string> {
     return response.data.data.player.username;
   } catch (error) {
     console.error('Failed to fetch player name:', error);
-    return uuid; // Fallback to UUID if name lookup fails
+    return uuid;
   }
 }
 
-// Calculate total XP for a hero
-function calculateHeroXP(heroSkills: HeroSkill): number {
-  return Object.values(heroSkills).reduce((skillTotal, abilities) => {
-    return skillTotal + Object.values(abilities).reduce((abilityTotal, { experiencePoints }) => {
-      return abilityTotal + experiencePoints;
-    }, 0);
-  }, 0);
-}
-
 export const api = {
-  async getTopPlayers(): Promise<Player[]> {
-    const response = await axios.get(`${API_BASE_URL}/stats/ffa/top`);
+  async getTopPlayers(sort: SortField = 'kills', page: number = 1): Promise<Player[]> {
+    const response = await axios.get(`${API_BASE_URL}/stats/ffa/top`, {
+      params: {
+        sort,
+        page
+      }
+    });
     const players = response.data;
     
-    // Convert UUIDs to usernames for each player
     const playersWithNames = await Promise.all(
       players.map(async (player: any) => ({
         ...player,

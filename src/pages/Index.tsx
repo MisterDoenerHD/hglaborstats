@@ -10,9 +10,9 @@ import { toast } from 'sonner';
 const Index = () => {
   const [searchedPlayer, setSearchedPlayer] = useState<Player | null>(null);
 
-  const { data: topPlayers = [] } = useQuery({
-    queryKey: ['topPlayers'],
-    queryFn: api.getTopPlayers,
+  const { data: initialPlayers = [] } = useQuery({
+    queryKey: ['players', 'kills', 1],
+    queryFn: () => api.getTopPlayers('kills', 1),
   });
 
   const handleSearch = async (query: string) => {
@@ -38,7 +38,7 @@ const Index = () => {
         {searchedPlayer ? (
           <PlayerStats player={searchedPlayer} />
         ) : (
-          <Leaderboard players={topPlayers} />
+          <Leaderboard initialPlayers={initialPlayers} />
         )}
       </div>
     </div>
