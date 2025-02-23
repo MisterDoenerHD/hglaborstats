@@ -6,14 +6,26 @@ interface PlayerStatsProps {
   player: Player;
 }
 
+interface ExperiencePoints {
+  experiencePoints: number;
+}
+
+interface HeroAbilities {
+  [key: string]: ExperiencePoints;
+}
+
+interface HeroSkills {
+  [key: string]: HeroAbilities;
+}
+
 const calculateHeroLevel = (xp: number): number => {
   return Math.floor(xp / 1000) + 1;
 };
 
-const calculateHeroXP = (heroSkills: any): { xp: number; level: number } => {
-  const totalXP = Object.values(heroSkills).reduce((skillTotal: number, abilities: any) => {
-    return skillTotal + Object.values(abilities).reduce((abilityTotal: number, ability: any) => {
-      return abilityTotal + (ability.experiencePoints || 0);
+const calculateHeroXP = (heroSkills: HeroSkills): { xp: number; level: number } => {
+  const totalXP = Object.values(heroSkills).reduce((skillTotal: number, abilities: HeroAbilities) => {
+    return skillTotal + Object.values(abilities).reduce((abilityTotal: number, ability: ExperiencePoints) => {
+      return abilityTotal + ability.experiencePoints;
     }, 0);
   }, 0);
 
@@ -28,7 +40,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player }) => {
       <div className="bg-pokemon-light border-2 border-pokemon-border rounded p-6">
         <div className="grid gap-4">
           {Object.entries(player.heroes).map(([hero, skills]) => {
-            const { xp, level } = calculateHeroXP(skills);
+            const { xp, level } = calculateHeroXP(skills as HeroSkills);
             const nextLevelXP = level * 1000;
             const progress = (xp % 1000) / 1000 * 100;
             
