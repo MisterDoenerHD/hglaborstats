@@ -4,14 +4,27 @@ import axios from 'axios';
 const API_BASE_URL = 'https://api.hglabor.de';
 const PLAYERDB_API_URL = 'https://playerdb.co/api/player/minecraft';
 
+interface HeroAbility {
+  [key: string]: {
+    experiencePoints: number;
+  };
+}
+
+interface HeroSkill {
+  [key: string]: HeroAbility;
+}
+
 export interface Player {
   name: string;
-  uuid: string;
+  playerId: string;
+  xp: number;
+  kills: number;
+  deaths: number;
+  currentKillStreak: number;
+  highestKillStreak: number;
+  bounty: number;
   heroes: {
-    [key: string]: {
-      level: number;
-      xp: number;
-    };
+    [heroName: string]: HeroSkill;
   };
 }
 
@@ -38,6 +51,15 @@ async function getPlayerNameFromUUID(uuid: string): Promise<string> {
   }
 }
 
+// Calculate total XP for a hero
+function calculateHeroXP(heroSkills: HeroSkill): number {
+  return Object.values(heroSkills).reduce((skillTotal, abilities) => {
+    return skillTotal + Object.values(abilities).reduce((abilityTotal, { experiencePoints }) => {
+      return abilityTotal + experiencePoints;
+    }, 0);
+  }, 0);
+}
+
 export const api = {
   async getTopPlayers(): Promise<Player[]> {
     const response = await axios.get(`${API_BASE_URL}/stats/ffa/top`);
@@ -47,8 +69,7 @@ export const api = {
     const playersWithNames = await Promise.all(
       players.map(async (player: any) => ({
         ...player,
-        name: await getPlayerNameFromUUID(player.uuid),
-        heroes: player.heroes || {} // Ensure heroes exists
+        name: await getPlayerNameFromUUID(player.playerId),
       }))
     );
     

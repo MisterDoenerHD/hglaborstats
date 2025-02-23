@@ -7,6 +7,17 @@ interface LeaderboardProps {
   players: Player[];
 }
 
+const calculateTotalXP = (player: Player): number => {
+  if (!player.heroes) return 0;
+  return Object.values(player.heroes).reduce((total, heroSkills) => {
+    return total + Object.values(heroSkills).reduce((skillTotal, abilities) => {
+      return skillTotal + Object.values(abilities).reduce((abilityTotal, { experiencePoints }) => {
+        return abilityTotal + experiencePoints;
+      }, 0);
+    }, 0);
+  }, 0);
+};
+
 const Leaderboard: React.FC<LeaderboardProps> = ({ players }) => {
   return (
     <div className="w-full max-w-2xl mx-auto animate-fade-in">
@@ -20,13 +31,13 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ players }) => {
         ) : (
           players.map((player, index) => (
             <div
-              key={player.uuid}
+              key={player.playerId}
               className="flex items-center p-3 mb-2 hover:bg-pokemon-green/10 transition-colors rounded"
             >
               <span className="font-press-start text-sm text-pokemon-dark w-8">{index + 1}.</span>
               <span className="font-mono text-pokemon-dark flex-1">{player.name}</span>
               <span className="font-mono text-pokemon-gray">
-                {Object.values(player.heroes || {}).reduce((acc, hero) => acc + hero.level, 0)} Points
+                {calculateTotalXP(player).toLocaleString()} XP
               </span>
             </div>
           ))
