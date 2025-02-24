@@ -34,10 +34,10 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ initialPlayers }) => {
   return (
     <div className="w-full max-w-4xl mx-auto animate-fade-in">
       <div className="flex items-center justify-center gap-2 mb-6">
-        <Trophy className="text-pokemon-green" size={24} />
-        <h2 className="font-press-start text-xl text-pokemon-dark">Top Players</h2>
+        <Trophy className="text-pokemon-green animate-fade-in" size={24} />
+        <h2 className="font-press-start text-xl text-pokemon-dark animate-fade-in">Top Players</h2>
       </div>
-      <div className="bg-pokemon-light border-2 border-pokemon-border rounded overflow-hidden">
+      <div className="bg-pokemon-light border-2 border-pokemon-border rounded overflow-hidden animate-scale-in">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -55,7 +55,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ initialPlayers }) => {
                   <th 
                     key={key}
                     onClick={() => handleSort(key as SortField)}
-                    className={`p-3 text-left font-press-start text-sm cursor-pointer hover:bg-pokemon-green/10 ${
+                    className={`p-3 text-left font-press-start text-sm cursor-pointer transition-colors duration-200 hover:bg-pokemon-green/10 ${
                       sortField === key ? 'text-pokemon-green' : 'text-pokemon-dark'
                     }`}
                   >
@@ -71,7 +71,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ initialPlayers }) => {
               {players.map((player, index) => (
                 <tr 
                   key={player.playerId}
-                  className="border-b border-pokemon-border/50 hover:bg-pokemon-green/5"
+                  className="border-b border-pokemon-border/50 hover:bg-pokemon-green/5 transition-colors duration-200 animate-fade-in"
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <td className="p-3 font-press-start text-sm">{index + 1}</td>
                   <td className="p-3 font-mono">{player.name}</td>
@@ -91,7 +92,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ initialPlayers }) => {
             onClick={loadMore}
             disabled={isFetching}
             variant="outline"
-            className="font-press-start text-sm"
+            className="font-press-start text-sm transition-all duration-200 hover:scale-105"
           >
             {isFetching ? 'Loading...' : 'Load More'}
           </Button>
