@@ -17,7 +17,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ initialPlayers }) => {
   const { data: players = initialPlayers, isFetching } = useQuery({
     queryKey: ['players', sortField, page],
     queryFn: () => api.getTopPlayers(sortField, page),
-    keepPreviousData: true
+    placeholderData: initialPlayers
   });
 
   const handleSort = (field: SortField) => {

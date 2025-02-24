@@ -32,6 +32,7 @@ interface PlayerDBResponse {
   data: {
     player: {
       username: string;
+      id: string;
     };
   };
 }
@@ -74,10 +75,20 @@ export const api = {
 
   async searchPlayer(name: string): Promise<Player | null> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/stats/stats/heroes/player/${name}`);
-      return response.data;
+      // First, get the UUID from the player's name
+      const playerResponse = await axios.get<PlayerDBResponse>(`${PLAYERDB_API_URL}/${name}`);
+      const playerId = playerResponse.data.data.player.id;
+      const username = playerResponse.data.data.player.username;
+
+      // Then get the player's stats using the UUID
+      const response = await axios.get(`${API_BASE_URL}/stats/ffa/${playerId}`);
+      return {
+        ...response.data,
+        name: username,
+        playerId
+      };
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
+      if (axios.isAxiosError(error) && (error.response?.status === 404 || error.response?.status === 400)) {
         return null;
       }
       throw error;
