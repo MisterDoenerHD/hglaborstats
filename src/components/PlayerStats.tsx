@@ -1,7 +1,9 @@
 
 import React from 'react';
+import { useQueries } from '@tanstack/react-query';
 import type { Player } from '../services/api';
 import { Swords, Skull, Trophy, Star, Flame, Coins } from 'lucide-react';
+import { api } from '../services/api';
 
 interface PlayerStatsProps {
   player: Player;
@@ -19,19 +21,15 @@ interface HeroSkills {
   [key: string]: HeroAbilities;
 }
 
-const calculateHeroLevel = (xp: number): number => {
-  return Math.floor(xp / 1000) + 1;
+const calculateHeroLevel = (xp: number, levelScale: number): number => {
+  return Math.floor(Math.cbrt(xp / levelScale));
 };
 
-const calculateHeroXP = (heroSkills: HeroSkills): { xp: number; level: number } => {
-  const totalXP = Object.values(heroSkills).reduce((skillTotal: number, abilities: HeroAbilities) => {
-    return skillTotal + Object.values(abilities).reduce((abilityTotal: number, ability: ExperiencePoints) => {
-      return abilityTotal + ability.experiencePoints;
-    }, 0);
-  }, 0);
-
-  const level = calculateHeroLevel(totalXP);
-  return { xp: totalXP, level };
+const calculateProgress = (xp: number, levelScale: number): number => {
+  const currentLevel = calculateHeroLevel(xp, levelScale);
+  const currentLevelXP = levelScale * Math.pow(currentLevel, 3);
+  const nextLevelXP = levelScale * Math.pow(currentLevel + 1, 3);
+  return ((xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
 };
 
 const PlayerStats: React.FC<PlayerStatsProps> = ({ player }) => {
@@ -46,6 +44,14 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player }) => {
     { icon: Trophy, label: 'Highest Streak', value: player.highestKillStreak.toLocaleString() },
     { icon: Coins, label: 'Bounty', value: player.bounty.toLocaleString() }
   ];
+
+  // Fetch hero data for each hero the player has
+  const heroQueries = useQueries({
+    queries: Object.keys(player.heroes).map((hero) => ({
+      queryKey: ['hero', hero],
+      queryFn: () => api.getHeroData(hero),
+    }))
+  });
 
   return (
     <div className="w-full max-w-2xl mx-auto animate-slide-in">
@@ -68,10 +74,15 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player }) => {
       <div className="bg-pokemon-light border-2 border-pokemon-border rounded p-6">
         <h3 className="font-press-start text-sm text-pokemon-dark mb-4">Hero Progress</h3>
         <div className="grid gap-4">
-          {Object.entries(player.heroes).map(([hero, skills]) => {
-            const { xp, level } = calculateHeroXP(skills as HeroSkills);
-            const nextLevelXP = level * 1000;
-            const progress = (xp % 1000) / 1000 * 100;
+          {Object.entries(player.heroes).map(([hero, skills], index) => {
+            const heroData = heroQueries[index].data;
+            const totalXP = Object.values(skills as HeroSkills).reduce((total, abilities) => {
+              return total + Object.values(abilities).reduce((sum, { experiencePoints }) => sum + experiencePoints, 0);
+            }, 0);
+            
+            const levelScale = heroData?.properties?.[Object.keys(heroData.properties)[0]]?.[0]?.levelScale || 315;
+            const level = calculateHeroLevel(totalXP, levelScale);
+            const progress = calculateProgress(totalXP, levelScale);
             
             return (
               <div key={hero} className="border-2 border-pokemon-border rounded p-4">
@@ -87,7 +98,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player }) => {
                 </div>
                 <div className="mt-2 text-right">
                   <span className="font-mono text-xs text-pokemon-dark">
-                    {(xp % 1000).toLocaleString()} / 1000 XP
+                    {totalXP.toLocaleString()} XP
                   </span>
                 </div>
               </div>

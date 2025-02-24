@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 const API_BASE_URL = 'https://api.hglabor.de';
@@ -39,18 +38,23 @@ interface PlayerDBResponse {
 
 export type SortField = 'kills' | 'deaths' | 'xp' | 'currentKillStreak' | 'highestKillStreak' | 'bounty';
 
-async function getPlayerNameFromUUID(uuid: string): Promise<string> {
-  try {
-    const formattedUUID = uuid.replace(
-      /(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/,
-      '$1-$2-$3-$4-$5'
-    );
-    const response = await axios.get<PlayerDBResponse>(`${PLAYERDB_API_URL}/${formattedUUID}`);
-    return response.data.data.player.username;
-  } catch (error) {
-    console.error('Failed to fetch player name:', error);
-    return uuid;
-  }
+interface HeroProperty {
+  type: string;
+  baseValue: number;
+  maxLevel: number;
+  name: string;
+  modifier: {
+    type: string;
+    steps: number[];
+  };
+  levelScale: number;
+}
+
+interface HeroData {
+  internalKey: string;
+  properties: {
+    [key: string]: HeroProperty[];
+  };
 }
 
 export const api = {
@@ -93,5 +97,24 @@ export const api = {
       }
       throw error;
     }
+  },
+
+  async getHeroData(hero: string): Promise<HeroData> {
+    const response = await axios.get(`${API_BASE_URL}/ffa/hero/${hero}`);
+    return response.data;
   }
 };
+
+async function getPlayerNameFromUUID(uuid: string): Promise<string> {
+  try {
+    const formattedUUID = uuid.replace(
+      /(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/,
+      '$1-$2-$3-$4-$5'
+    );
+    const response = await axios.get<PlayerDBResponse>(`${PLAYERDB_API_URL}/${formattedUUID}`);
+    return response.data.data.player.username;
+  } catch (error) {
+    console.error('Failed to fetch player name:', error);
+    return uuid;
+  }
+}
