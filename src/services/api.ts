@@ -65,7 +65,7 @@ export const api = {
         page
       }
     });
-    const players = response.data;
+    const players = response.data.slice(0, 25); // Limit to top 25 players
     
     const playersWithNames = await Promise.all(
       players.map(async (player: any) => ({

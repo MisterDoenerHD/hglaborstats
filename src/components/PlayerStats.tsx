@@ -4,6 +4,7 @@ import type { Player } from '../services/api';
 import { Swords, Skull, Trophy, Star, Flame, Coins, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { api } from '../services/api';
 import { Button } from './ui/button';
+import MinecraftModel from './MinecraftModel';
 
 interface PlayerStatsProps {
   player: Player;
@@ -71,6 +72,8 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
         </Button>
         <h2 className="font-press-start text-xl text-pokemon-dark text-center flex-1">{player.name}</h2>
       </div>
+
+      <MinecraftModel playerName={player.name} />
       
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         {stats.map(({ icon: Icon, label, value }, index) => (
