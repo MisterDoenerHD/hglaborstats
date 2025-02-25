@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
-import { useQueries } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
 import type { Player } from '../services/api';
-import { Swords, Skull, Trophy, Star, Flame, Coins, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
+import { Swords, Skull, Trophy, Star, Flame, Coins, ChevronDown, ChevronUp, ArrowLeft, Crown } from 'lucide-react';
 import { api } from '../services/api';
 import { Button } from './ui/button';
 import MinecraftModel from './MinecraftModel';
@@ -43,13 +44,26 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
 
   const kdRatio = player.deaths > 0 ? (player.kills / player.deaths).toFixed(2) : player.kills;
 
+  // Query to get top players for comparison
+  const { data: topPlayers = [] } = useQuery({
+    queryKey: ['topPlayers'],
+    queryFn: () => api.getTopPlayers('kills', 1),
+  });
+
+  // Find top players for each stat
+  const topKills = Math.max(...topPlayers.map(p => p.kills));
+  const topDeaths = Math.max(...topPlayers.map(p => p.deaths));
+  const topBounty = Math.max(...topPlayers.map(p => p.bounty));
+  const topCurrentStreak = Math.max(...topPlayers.map(p => p.currentKillStreak));
+  const topHighestStreak = Math.max(...topPlayers.map(p => p.highestKillStreak));
+
   const stats = [
-    { icon: Swords, label: 'Kills', value: player.kills.toLocaleString() },
-    { icon: Skull, label: 'Deaths', value: player.deaths.toLocaleString() },
+    { icon: Swords, label: 'Kills', value: player.kills.toLocaleString(), isTop: player.kills >= topKills },
+    { icon: Skull, label: 'Deaths', value: player.deaths.toLocaleString(), isTop: player.deaths >= topDeaths },
     { icon: Star, label: 'K/D Ratio', value: kdRatio },
-    { icon: Flame, label: 'Current Streak', value: player.currentKillStreak.toLocaleString() },
-    { icon: Trophy, label: 'Highest Streak', value: player.highestKillStreak.toLocaleString() },
-    { icon: Coins, label: 'Bounty', value: player.bounty.toLocaleString() }
+    { icon: Flame, label: 'Current Streak', value: player.currentKillStreak.toLocaleString(), isTop: player.currentKillStreak >= topCurrentStreak },
+    { icon: Trophy, label: 'Highest Streak', value: player.highestKillStreak.toLocaleString(), isTop: player.highestKillStreak >= topHighestStreak },
+    { icon: Coins, label: 'Bounty', value: player.bounty.toLocaleString(), isTop: player.bounty >= topBounty }
   ];
 
   const heroQueries = useQueries({
@@ -61,30 +75,38 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
 
   return (
     <div className="w-full max-w-2xl mx-auto animate-slide-in">
-      <div className="flex items-center gap-4 mb-6">
+      <div className="relative mb-6">
         <Button
           variant="outline"
           onClick={onBack}
-          className="flex items-center gap-2 font-press-start text-sm hover:scale-105 transition-transform duration-200"
+          className="absolute left-0 top-0 flex items-center gap-2 font-press-start text-sm hover:scale-105 transition-transform duration-200"
         >
           <ArrowLeft size={16} />
           Back
         </Button>
-        <h2 className="font-press-start text-xl text-pokemon-dark text-center flex-1">{player.name}</h2>
+        <h2 className="font-press-start text-xl text-pokemon-dark text-center w-full pt-1">
+          {player.name}
+        </h2>
       </div>
 
       <MinecraftModel playerName={player.name} />
       
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        {stats.map(({ icon: Icon, label, value }, index) => (
+        {stats.map(({ icon: Icon, label, value, isTop }, index) => (
           <div 
             key={label} 
-            className="bg-pokemon-light border-2 border-pokemon-border rounded p-4 animate-fade-in"
+            className="bg-pokemon-light border-2 border-pokemon-border rounded p-4 animate-fade-in relative"
             style={{ animationDelay: `${index * 100}ms` }}
           >
             <div className="flex items-center gap-2 mb-2">
               <Icon className="text-pokemon-green" size={20} />
               <span className="font-press-start text-xs text-pokemon-dark">{label}</span>
+              {isTop && (
+                <Crown 
+                  size={16} 
+                  className="text-yellow-500 absolute top-2 right-2 animate-bounce" 
+                />
+              )}
             </div>
             <span className="font-mono text-lg text-pokemon-dark">{value}</span>
           </div>
