@@ -28,6 +28,14 @@ const Index = () => {
     }
   };
 
+  const handlePlayerClick = (player: Player) => {
+    setSearchedPlayer(player);
+  };
+
+  const handleBack = () => {
+    setSearchedPlayer(null);
+  };
+
   return (
     <div className="min-h-screen bg-pokemon-light px-4 py-8">
       <div className="max-w-4xl mx-auto">
@@ -36,9 +44,9 @@ const Index = () => {
         </h1>
         <SearchBar onSearch={handleSearch} />
         {searchedPlayer ? (
-          <PlayerStats player={searchedPlayer} />
+          <PlayerStats player={searchedPlayer} onBack={handleBack} />
         ) : (
-          <Leaderboard initialPlayers={initialPlayers} />
+          <Leaderboard initialPlayers={initialPlayers} onPlayerClick={handlePlayerClick} />
         )}
       </div>
     </div>

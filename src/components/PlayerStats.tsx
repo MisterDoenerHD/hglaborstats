@@ -1,12 +1,13 @@
-
 import React, { useState } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import type { Player } from '../services/api';
-import { Swords, Skull, Trophy, Star, Flame, Coins, ChevronDown, ChevronUp } from 'lucide-react';
+import { Swords, Skull, Trophy, Star, Flame, Coins, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { api } from '../services/api';
+import { Button } from './ui/button';
 
 interface PlayerStatsProps {
   player: Player;
+  onBack: () => void;
 }
 
 interface ExperiencePoints {
@@ -36,10 +37,9 @@ const calculateAbilityLevel = (xp: number, levelScale: number): number => {
   return Math.floor(Math.cbrt(xp / levelScale));
 };
 
-const PlayerStats: React.FC<PlayerStatsProps> = ({ player }) => {
+const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
   const [expandedHero, setExpandedHero] = useState<string | null>(null);
 
-  // Calculate K/D ratio
   const kdRatio = player.deaths > 0 ? (player.kills / player.deaths).toFixed(2) : player.kills;
 
   const stats = [
@@ -59,10 +59,19 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player }) => {
   });
 
   return (
-    <div className="w-full max-w-2xl mx-auto animate-fade-in">
-      <h2 className="font-press-start text-xl text-pokemon-dark mb-6 text-center">{player.name}</h2>
+    <div className="w-full max-w-2xl mx-auto animate-slide-in">
+      <div className="flex items-center gap-4 mb-6">
+        <Button
+          variant="outline"
+          onClick={onBack}
+          className="flex items-center gap-2 font-press-start text-sm hover:scale-105 transition-transform duration-200"
+        >
+          <ArrowLeft size={16} />
+          Back
+        </Button>
+        <h2 className="font-press-start text-xl text-pokemon-dark text-center flex-1">{player.name}</h2>
+      </div>
       
-      {/* General Stats */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         {stats.map(({ icon: Icon, label, value }, index) => (
           <div 
@@ -79,7 +88,6 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player }) => {
         ))}
       </div>
 
-      {/* Hero Progress */}
       <div className="bg-pokemon-light border-2 border-pokemon-border rounded p-6 animate-fade-in" style={{ animationDelay: '300ms' }}>
         <h3 className="font-press-start text-sm text-pokemon-dark mb-4">Hero Progress</h3>
         <div className="grid gap-4">
@@ -126,7 +134,6 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player }) => {
                   </div>
                 </button>
 
-                {/* Ability Details */}
                 <div className={`mt-4 pl-4 border-l-2 border-pokemon-border overflow-hidden transition-all duration-300 ease-out ${
                   isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
                 }`}>
