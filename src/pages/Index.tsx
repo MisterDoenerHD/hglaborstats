@@ -37,10 +37,19 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-pokemon-light px-4 py-8">
+    <div 
+      className="min-h-screen px-4 py-8 bg-cover bg-center bg-fixed"
+      style={{ 
+        backgroundImage: 'url("https://i.imgur.com/WDaYH1S.jpeg")',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        backgroundBlendMode: 'overlay'
+      }}
+    >
       <div className="max-w-4xl mx-auto">
-        <h1 className="font-press-start text-2xl text-center text-pokemon-dark mb-8">
-          HGLabor Stats
+        <h1 className="font-press-start text-2xl text-center text-pokemon-dark mb-8 relative overflow-hidden">
+          <span className="relative inline-block animate-shimmer before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent">
+            HGLabor Stats
+          </span>
         </h1>
         <SearchBar onSearch={handleSearch} />
         {searchedPlayer ? (
@@ -49,6 +58,22 @@ const Index = () => {
           <Leaderboard initialPlayers={initialPlayers} onPlayerClick={handlePlayerClick} />
         )}
       </div>
+      <style>
+        {`
+          @keyframes shimmer {
+            0% {
+              transform: translateX(-100%);
+            }
+            100% {
+              transform: translateX(100%);
+            }
+          }
+          
+          .animate-shimmer::before {
+            animation: shimmer 2s infinite;
+          }
+        `}
+      </style>
     </div>
   );
 };
