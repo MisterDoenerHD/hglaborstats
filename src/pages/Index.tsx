@@ -37,26 +37,39 @@ const Index = () => {
   };
 
   return (
-    <div 
-      className="min-h-screen px-4 py-8 bg-cover bg-center bg-fixed"
-      style={{ 
-        backgroundImage: 'url("https://i.imgur.com/WDaYH1S.jpeg")',
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        backgroundBlendMode: 'overlay'
-      }}
-    >
-      <div className="max-w-4xl mx-auto">
-        <h1 className="font-press-start text-2xl text-center text-pokemon-dark mb-8 relative overflow-hidden">
-          <span className="relative inline-block animate-shimmer before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent">
+    <div className="min-h-screen px-4 py-8" style={{ backgroundColor: '#FDE1D3' }}>
+      <div 
+        className="max-w-4xl mx-auto p-6 rounded-lg"
+        style={{
+          backgroundColor: '#F2FCE2',
+          border: '4px solid #403E43',
+          boxShadow: '8px 8px 0 #1A1F2C'
+        }}
+      >
+        <h1 className="font-press-start text-2xl text-center mb-8 relative overflow-hidden">
+          <span 
+            className="relative inline-block animate-shimmer before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-[#8E9196]/20 before:to-transparent"
+            style={{ color: '#1A1F2C' }}
+          >
             HGLabor Stats
           </span>
         </h1>
-        <SearchBar onSearch={handleSearch} />
-        {searchedPlayer ? (
-          <PlayerStats player={searchedPlayer} onBack={handleBack} />
-        ) : (
-          <Leaderboard initialPlayers={initialPlayers} onPlayerClick={handlePlayerClick} />
-        )}
+        <div className="mb-8">
+          <SearchBar onSearch={handleSearch} />
+        </div>
+        <div 
+          className="rounded-lg p-4"
+          style={{
+            backgroundColor: '#FFDEE2',
+            border: '2px solid #403E43'
+          }}
+        >
+          {searchedPlayer ? (
+            <PlayerStats player={searchedPlayer} onBack={handleBack} />
+          ) : (
+            <Leaderboard initialPlayers={initialPlayers} onPlayerClick={handlePlayerClick} />
+          )}
+        </div>
       </div>
       <style>
         {`

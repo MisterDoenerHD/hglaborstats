@@ -27,10 +27,13 @@ export default {
         foreground: "hsl(var(--foreground))",
         pokemon: {
           green: "#9DBF9E",
-          gray: "#A8A878",
-          dark: "#2F2F2F",
-          light: "#F8F8F8",
-          border: "#2F2F2F"
+          gray: "#8E9196",
+          dark: "#1A1F2C",
+          light: "#F2FCE2",
+          border: "#403E43",
+          peach: "#FDE1D3",
+          pink: "#FFDEE2",
+          yellow: "#FEF7CD"
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",
