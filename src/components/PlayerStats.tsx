@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import type { Player } from '../services/api';
@@ -39,31 +38,71 @@ const calculateAbilityLevel = (xp: number, levelScale: number): number => {
   return Math.floor(Math.cbrt(xp / levelScale));
 };
 
+const getRankColor = (rank: number): string => {
+  switch (rank) {
+    case 1:
+      return "text-yellow-500"; // Gold
+    case 2:
+      return "text-gray-400"; // Silver
+    case 3:
+      return "text-amber-700"; // Bronze
+    default:
+      return "";
+  }
+};
+
 const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
   const [expandedHero, setExpandedHero] = useState<string | null>(null);
 
   const kdRatio = player.deaths > 0 ? (player.kills / player.deaths).toFixed(2) : player.kills;
 
-  // Query to get top players for comparison
   const { data: topPlayers = [] } = useQuery({
     queryKey: ['topPlayers'],
     queryFn: () => api.getTopPlayers('kills', 1),
   });
 
-  // Find top players for each stat
-  const topKills = Math.max(...topPlayers.map(p => p.kills));
-  const topDeaths = Math.max(...topPlayers.map(p => p.deaths));
-  const topBounty = Math.max(...topPlayers.map(p => p.bounty));
-  const topCurrentStreak = Math.max(...topPlayers.map(p => p.currentKillStreak));
-  const topHighestStreak = Math.max(...topPlayers.map(p => p.highestKillStreak));
+  const getPlayerRank = (playerValue: number, values: number[]): number => {
+    const sortedValues = [...new Set(values)].sort((a, b) => b - a);
+    const rank = sortedValues.indexOf(playerValue) + 1;
+    return rank <= 3 ? rank : 0;
+  };
 
   const stats = [
-    { icon: Swords, label: 'Kills', value: player.kills.toLocaleString(), isTop: player.kills >= topKills },
-    { icon: Skull, label: 'Deaths', value: player.deaths.toLocaleString(), isTop: player.deaths >= topDeaths },
-    { icon: Star, label: 'K/D Ratio', value: kdRatio },
-    { icon: Flame, label: 'Current Streak', value: player.currentKillStreak.toLocaleString(), isTop: player.currentKillStreak >= topCurrentStreak },
-    { icon: Trophy, label: 'Highest Streak', value: player.highestKillStreak.toLocaleString(), isTop: player.highestKillStreak >= topHighestStreak },
-    { icon: Coins, label: 'Bounty', value: player.bounty.toLocaleString(), isTop: player.bounty >= topBounty }
+    { 
+      icon: Swords, 
+      label: 'Kills', 
+      value: player.kills.toLocaleString(), 
+      rank: getPlayerRank(player.kills, topPlayers.map(p => p.kills))
+    },
+    { 
+      icon: Skull, 
+      label: 'Deaths', 
+      value: player.deaths.toLocaleString(), 
+      rank: getPlayerRank(player.deaths, topPlayers.map(p => p.deaths))
+    },
+    { 
+      icon: Star, 
+      label: 'K/D Ratio', 
+      value: kdRatio 
+    },
+    { 
+      icon: Flame, 
+      label: 'Current Streak', 
+      value: player.currentKillStreak.toLocaleString(), 
+      rank: getPlayerRank(player.currentKillStreak, topPlayers.map(p => p.currentKillStreak))
+    },
+    { 
+      icon: Trophy, 
+      label: 'Highest Streak', 
+      value: player.highestKillStreak.toLocaleString(), 
+      rank: getPlayerRank(player.highestKillStreak, topPlayers.map(p => p.highestKillStreak))
+    },
+    { 
+      icon: Coins, 
+      label: 'Bounty', 
+      value: player.bounty.toLocaleString(), 
+      rank: getPlayerRank(player.bounty, topPlayers.map(p => p.bounty))
+    }
   ];
 
   const heroQueries = useQueries({
@@ -92,7 +131,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
       <MinecraftModel playerName={player.name} />
       
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        {stats.map(({ icon: Icon, label, value, isTop }, index) => (
+        {stats.map(({ icon: Icon, label, value, rank }, index) => (
           <div 
             key={label} 
             className="bg-pokemon-light border-2 border-pokemon-border rounded p-4 animate-fade-in relative"
@@ -101,10 +140,10 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
             <div className="flex items-center gap-2 mb-2">
               <Icon className="text-pokemon-green" size={20} />
               <span className="font-press-start text-xs text-pokemon-dark">{label}</span>
-              {isTop && (
+              {rank > 0 && rank <= 3 && (
                 <Crown 
                   size={16} 
-                  className="text-yellow-500 absolute top-2 right-2 animate-bounce" 
+                  className={`${getRankColor(rank)} absolute top-2 right-2 animate-bounce`} 
                 />
               )}
             </div>
