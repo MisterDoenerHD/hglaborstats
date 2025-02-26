@@ -46,9 +46,9 @@ const Index = () => {
           boxShadow: '8px 8px 0 #1A1F2C'
         }}
       >
-        <h1 className="font-press-start text-2xl text-center mb-8 relative overflow-hidden">
+        <h1 className="font-press-start text-4xl text-center mb-12 relative overflow-hidden">
           <span 
-            className="relative inline-block animate-shimmer before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-[#8E9196]/20 before:to-transparent"
+            className="relative inline-block animate-shimmer before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-[#9DBF9E]/30 before:to-transparent"
             style={{ color: '#1A1F2C' }}
           >
             HGLabor Stats
