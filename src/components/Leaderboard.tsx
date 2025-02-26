@@ -45,8 +45,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ initialPlayers, onPlayerClick
         <div className="overflow-x-auto border-b border-pokemon-border">
           <div className="w-fit">
             <div className="flex">
-              <div className="w-16"></div> {/* Placeholder for # column */}
-              <div className="w-48"></div> {/* Placeholder for Player column */}
+              <div className="w-16"></div>
+              <div className="w-48"></div>
               {headers.map(() => (
                 <div key={`scroll-${Math.random()}`} className="w-36"></div>
               ))}
@@ -81,8 +81,13 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ initialPlayers, onPlayerClick
               {players.map((player, index) => (
                 <tr 
                   key={`${player.playerId}-${index}`}
-                  className="border-b border-pokemon-border/50 hover:bg-pokemon-green/5 transition-colors duration-200 animate-slide-in"
-                  style={{ animationDelay: `${index * 50}ms` }}
+                  className="border-b border-pokemon-border/50 hover:bg-pokemon-green/5 transition-colors duration-200"
+                  style={{
+                    animation: 'fade-slide-up 0.5s ease-out forwards',
+                    animationDelay: `${index * 100}ms`,
+                    opacity: 0,
+                    transform: 'translateY(20px)'
+                  }}
                 >
                   <td className="p-3 font-press-start text-sm w-16">{index + 1}</td>
                   <td className="p-3 font-mono w-48">
@@ -105,6 +110,21 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ initialPlayers, onPlayerClick
           </table>
         </div>
       </div>
+
+      <style>
+        {`
+          @keyframes fade-slide-up {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
     </div>
   );
 };
