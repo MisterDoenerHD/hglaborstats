@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import type { Player } from '../services/api';
@@ -128,7 +129,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
         </h2>
       </div>
 
-      <MinecraftModel playerName={player.name} />
+      <MinecraftModel playerName={player.name} playerId={player.playerId} />
       
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         {stats.map(({ icon: Icon, label, value, rank }, index) => (

@@ -46,10 +46,12 @@ const Index = () => {
           boxShadow: '8px 8px 0 #1A1F2C'
         }}
       >
-        <h1 className="font-press-start text-4xl text-center mb-12 relative overflow-hidden">
+        <h1 className="font-press-start text-4xl text-center mb-12 relative">
           <span 
-            className="relative inline-block animate-shimmer before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-[#9DBF9E]/30 before:to-transparent"
-            style={{ color: '#1A1F2C' }}
+            className="relative inline-block text-pokemon-dark"
+            style={{ 
+              textShadow: '0 0 10px rgba(157, 191, 158, 0.7), 0 0 20px rgba(157, 191, 158, 0.5)' 
+            }}
           >
             HGLabor Stats
           </span>
@@ -71,22 +73,6 @@ const Index = () => {
           )}
         </div>
       </div>
-      <style>
-        {`
-          @keyframes shimmer {
-            0% {
-              transform: translateX(-100%);
-            }
-            100% {
-              transform: translateX(100%);
-            }
-          }
-          
-          .animate-shimmer::before {
-            animation: shimmer 2s infinite;
-          }
-        `}
-      </style>
     </div>
   );
 };
