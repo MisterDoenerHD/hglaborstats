@@ -23,9 +23,6 @@ const MinecraftModel: React.FC<MinecraftModelProps> = ({ playerName, playerId })
           loading="lazy"
         />
       </div>
-      <span className="font-mono text-sm text-pokemon-dark">
-        {playerName}
-      </span>
     </div>
   );
 };
