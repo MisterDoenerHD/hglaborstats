@@ -104,13 +104,14 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ initialPlayers, onPlayerClick
                   }}
                 >
                   <td className={`p-3 font-press-start text-sm w-16 relative ${getRankStyle(index)}`}>
-                    {index < 3 && (
+                    {index < 3 ? (
                       <Crown 
-                        size={index === 0 ? 20 : index === 1 ? 18 : 16} 
-                        className={`absolute -left-1 top-2 ${getRankStyle(index)}`} 
+                        size={index === 0 ? 24 : index === 1 ? 22 : 20} 
+                        className={`mx-auto ${getRankStyle(index)}`} 
                       />
+                    ) : (
+                      <span>{index + 1}</span>
                     )}
-                    <span className="ml-5">{index + 1}</span>
                   </td>
                   <td className={`p-3 font-mono w-48 ${index < 3 ? 'text-lg font-bold' : ''}`}>
                     <button 
